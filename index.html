@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LANTROLL - Validador de Autenticidad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f7e9c3;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .main-container {
+            max-width: 900px;
+            width: 100%;
+        }
+        .validator {
+            background: linear-gradient(145deg, #f9c53a, #f5a623);
+            border-radius: 40px;
+            padding: 30px 30px 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+            text-align: center;
+            transition: opacity 0.4s;
+            border: 2px solid #e08e0b;
+        }
+        .brand {
+            font-size: 3.5rem;
+            font-weight: 900;
+            font-style: italic;
+            color: #a35e0a;
+            text-shadow: 2px 2px 0 #f9d56e;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+        .sub {
+            color: #7a4a05;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            border-top: 2px solid #d48d1a;
+            border-bottom: 2px solid #d48d1a;
+            display: inline-block;
+            padding: 5px 20px;
+            background: rgba(255,255,200,0.3);
+            border-radius: 30px;
+        }
+        .validator h2 {
+            color: #4d2f02;
+            font-size: 1.8rem;
+            margin: 20px 0 10px;
+        }
+        .validator p {
+            color: #5a3a08;
+            font-weight: 500;
+        }
+        .lote-input {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 25px 0 20px;
+        }
+        .lote-input input {
+            padding: 14px 24px;
+            font-size: 1.2rem;
+            border: 2px solid #b87a1a;
+            border-radius: 60px;
+            width: 250px;
+            text-align: center;
+            font-weight: bold;
+            font-family: monospace;
+            background: #fff9e6;
+            color: #3d2b02;
+            outline: none;
+        }
+        .lote-input input:focus {
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 3px rgba(255,140,0,0.3);
+        }
+        .lote-input button {
+            background: #c97d1a;
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #8f5e12;
+        }
+        .lote-input button:hover {
+            background: #b56e14;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #8f5e12;
+        }
+
+        .mensaje {
+            margin-top: 10px;
+            padding: 14px 20px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: none;
+            letter-spacing: 0.5px;
+        }
+        .mensaje.ok {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+            display: block;
+        }
+        .mensaje.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+            display: block;
+        }
+        .mensaje.info {
+            background: #fff3cd;
+            color: #856404;
+            border: 2px solid #ffc107;
+            display: block;
+        }
+
+        .status-badge {
+            font-size: 2.5rem;
+            font-weight: 900;
+            padding: 10px 25px;
+            border-radius: 60px;
+            display: none;
+            margin: 15px auto 0;
+            width: fit-content;
+            letter-spacing: 2px;
+        }
+        .status-badge.ok {
+            background: #d4edda;
+            color: #155724;
+            border: 3px solid #28a745;
+            display: block;
+        }
+        .status-badge.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 3px solid #dc3545;
+            display: block;
+        }
+
+        .bula {
+            background: #fffbf0;
+            border-radius: 30px;
+            padding: 25px 30px;
+            margin-top: 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-left: 8px solid #f5a623;
+            display: none;
+            animation: fadeUp 0.5s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .bula h3 {
+            color: #b87a1a;
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+        .bula .detalle {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            background: #fcefcf;
+            padding: 12px 18px;
+            border-radius: 20px;
+            margin: 12px 0;
+            font-weight: 500;
+            color: #3d2b02;
+        }
+        .bula .seccion {
+            margin-top: 20px;
+        }
+        .bula .seccion h4 {
+            color: #b87a1a;
+            border-bottom: 2px solid #f5a623;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .bula .seccion p, .bula .seccion li {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #2d1f03;
+            text-align: justify;
+        }
+        .bula ul {
+            padding-left: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .brand { font-size: 2.5rem; }
+            .lote-input input { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div id="validator" class="validator">
+        <div class="brand">LANTROLL</div>
+        <div class="sub">Verificador de Autenticidad</div>
+        <h2>Ingrese el número de lote</h2>
+        <p>Localizado en el envase del medicamento</p>
+        <div class="lote-input">
+            <input type="text" id="loteInput" maxlength="6" placeholder="Número de lote" autocomplete="off">
+            <button id="btnValidar">VERIFICAR</button>
+        </div>
+        <div id="mensaje" class="mensaje info">
+            Ingrese el número de lote para validar.
+        </div>
+        <div id="statusBadge" class="status-badge"></div>
+    </div>
+
+    <div id="bula" class="bula">
+        <h3 id="bulaNombre">—</h3>
+        <div class="detalle">
+            <span><strong>Lote:</strong> <span id="bulaLote">—</span></span>
+            <span><strong>Validez:</strong> <span id="bulaValidez">05/2029</span></span>
+            <span><strong>Estado:</strong> <span id="bulaEstado">Original</span></span>
+        </div>
+        <div class="seccion">
+            <h4>Composición</h4>
+            <p id="bulaComposicion">—</p>
+        </div>
+        <div class="seccion">
+            <h4>Indicación</h4>
+            <p id="bulaIndicacion">—</p>
+        </div>
+        <div class="seccion">
+            <h4>Posología</h4>
+            <p id="bulaPosologia">—</p>
+        </div>
+        <div class="seccion">
+            <h4>Reacciones adversas</h4>
+            <p id="bulaReacciones">—</p>
+        </div>
+        <div class="seccion">
+            <h4>Contraindicaciones</h4>
+            <p id="bulaContraindicaciones">—</p>
+        </div>
+        <div style="margin-top:20px; text-align:center; font-size:0.8rem; color:#8f6d30;">
+            <em>LANTROLL — Producto original verificado</em>
+        </div>
+    </div>
+</div>
+
+<script>
+    const productos = {
+        "00122": {
+            nombre: "DURATESTON 250 mg",
+            validez: "05/2029",
+            composicion: "Propionato de testosterona 36 mg, Fenilpropionato 72 mg, Isocaproato 72 mg, Decanoato 120 mg.",
+            indicacion: "Reposición de testosterona en hipogonadismo masculino.",
+            posologia: "1 mL (250 mg) cada 3 semanas por vía intramuscular profunda.",
+            reacciones: "Acné, retención hídrica, ginecomastia, cambios de humor.",
+            contraindicaciones: "Embarazo, cáncer de próstata, insuficiencia hepática grave."
+        },
+        "00123": {
+            nombre: "DECA 200 mg",
+            validez: "05/2029",
+            composicion: "Nandrolona decanoato 200 mg.",
+            indicacion: "Osteoporosis, anemias, estados catabólicos.",
+            posologia: "50 a 100 mg cada 1 a 3 semanas por vía intramuscular.",
+            reacciones: "Acné, retención de líquidos, supresión testicular.",
+            contraindicaciones: "Embarazo, cáncer de mama, insuficiencia hepática."
+        },
+        "00124": {
+            nombre: "ENANTATO DE TESTOSTERONA 250 mg",
+            validez: "05/2029",
+            composicion: "Enantato de testosterona 250 mg.",
+            indicacion: "Hipogonadismo primario y secundario.",
+            posologia: "250 mg cada 2 a 3 semanas por vía intramuscular.",
+            reacciones: "Ginecomastia, alopecia, policitemia.",
+            contraindicaciones: "Cáncer de próstata, mujeres embarazadas."
+        },
+        "00125": {
+            nombre: "DROSTANOLONA PROPIONATO 100 mg",
+            validez: "05/2029",
+            composicion: "Propionato de drostanolona 100 mg.",
+            indicacion: "Caquexia oncológica, estados catabólicos.",
+            posologia: "100 mg cada 2 a 3 días por vía intramuscular.",
+            reacciones: "Acné, alopecia, agresividad, supresión testicular.",
+            contraindicaciones: "Embarazo, cáncer de próstata, insuficiencia hepática."
+        }
+    };
+
+    const loteInput = document.getElementById('loteInput');
+    const btnValidar = document.getElementById('btnValidar');
+    const mensaje = document.getElementById('mensaje');
+    const statusBadge = document.getElementById('statusBadge');
+    const bulaDiv = document.getElementById('bula');
+
+    const bulaNombre = document.getElementById('bulaNombre');
+    const bulaLote = document.getElementById('bulaLote');
+    const bulaValidez = document.getElementById('bulaValidez');
+    const bulaEstado = document.getElementById('bulaEstado');
+    const bulaComposicion = document.getElementById('bulaComposicion');
+    const bulaIndicacion = document.getElementById('bulaIndicacion');
+    const bulaPosologia = document.getElementById('bulaPosologia');
+    const bulaReacciones = document.getElementById('bulaReacciones');
+    const bulaContraindicaciones = document.getElementById('bulaContraindicaciones');
+
+    function validar() {
+        const lote = loteInput.value.trim();
+        if (lote === "") {
+            mensaje.className = "mensaje info";
+            mensaje.innerHTML = "Ingrese el número de lote para validar.";
+            statusBadge.className = "status-badge";
+            statusBadge.style.display = "none";
+            bulaDiv.style.display = "none";
+            return;
+        }
+        if (productos[lote]) {
+            const prod = productos[lote];
+            mensaje.className = "mensaje ok";
+            mensaje.innerHTML = "Lote VERIFICADO. Producto ORIGINAL.";
+
+            statusBadge.className = "status-badge ok";
+            statusBadge.style.display = "block";
+            statusBadge.innerHTML = "ORIGINAL";
+
+            bulaNombre.textContent = prod.nombre;
+            bulaLote.textContent = lote;
+            bulaValidez.textContent = prod.validez;
+            bulaEstado.textContent = "Original LANTROLL";
+            bulaComposicion.textContent = prod.composicion;
+            bulaIndicacion.textContent = prod.indicacion;
+            bulaPosologia.textContent = prod.posologia;
+            bulaReacciones.textContent = prod.reacciones;
+            bulaContraindicaciones.textContent = prod.contraindicaciones;
+            bulaDiv.style.display = "block";
+        } else {
+            mensaje.className = "mensaje error";
+            mensaje.innerHTML = "Lote INVÁLIDO. Producto FALSO o no registrado.";
+
+            statusBadge.className = "status-badge error";
+            statusBadge.style.display = "block";
+            statusBadge.innerHTML = "FALSO";
+
+            bulaDiv.style.display = "none";
+        }
+    }
+
+    btnValidar.addEventListener('click', validar);
+    loteInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') validar();
+    });
+
+    loteInput.addEventListener('input', () => {
+        if (mensaje.className !== 'mensaje info') {
+            mensaje.className = "mensaje info";
+            mensaje.innerHTML = "Ingrese el número de lote para validar.";
+            statusBadge.className = "status-badge";
+            statusBadge.style.display = "none";
+            bulaDiv.style.display = "none";
+        }
+    });
+</script>
+</body>
+</html>
